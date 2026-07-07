@@ -1,0 +1,131 @@
+{
+  "info": {
+    "name": "TravelHub API",
+    "_postman_id": "8b6c2f2c-7f5a-4c2a-9f1c-123456789abc",
+    "description": "Coleção de endpoints da API TravelHub",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Trips",
+      "item": [
+        {
+          "name": "Create Trip",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Paris Trip", "type": "text" },
+                { "key": "destination", "value": "Paris", "type": "text" },
+                { "key": "country", "value": "France", "type": "text" },
+                { "key": "city", "value": "Paris", "type": "text" },
+                { "key": "startDate", "value": "2026-07-10", "type": "text" },
+                { "key": "endDate", "value": "2026-07-20", "type": "text" },
+                { "key": "budget", "value": "5000", "type": "text" },
+                { "key": "description", "value": "Trip to Paris", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:3333/trips",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3333",
+              "path": ["trips"]
+            }
+          }
+        },
+        {
+          "name": "Get All Trips",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3333/trips"
+          }
+        },
+        {
+          "name": "Get Trip By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3333/trips/1"
+          }
+        },
+        {
+          "name": "Update Trip",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Updated Trip", "type": "text" }
+              ]
+            },
+            "url": "http://localhost:3333/trips/1"
+          }
+        },
+        {
+          "name": "Delete Trip",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:3333/trips/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Checklists",
+      "item": [
+        {
+          "name": "Create Checklist",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Levar passaporte\",\n  \"tripId\": 1\n}"
+            },
+            "url": "http://localhost:3333/checklists"
+          }
+        },
+        {
+          "name": "Get All Checklists",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3333/checklists"
+          }
+        },
+        {
+          "name": "Get Checklist By ID",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3333/checklists/1"
+          }
+        },
+        {
+          "name": "Update Checklist",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completed\": true\n}"
+            },
+            "url": "http://localhost:3333/checklists/1"
+          }
+        },
+        {
+          "name": "Delete Checklist",
+          "request": {
+            "method": "DELETE",
+            "url": "http://localhost:3333/checklists/1"
+          }
+        }
+      ]
+    }
+  ]
+}
