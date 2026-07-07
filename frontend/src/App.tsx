@@ -8,10 +8,8 @@ export default function App() {
   const [viagens, setViagens] = useState<ViagemData[]>([])
   const [busca, setBusca] = useState("")
 
-  // NOVO: Estado para controlar qual viagem está sendo editada
   const [viagemParaEditar, setViagemParaEditar] = useState<ViagemData | null>(null)
 
-  // Separei a busca em uma função para podermos chamar ela facilmente sempre que salvarmos ou editarmos algo
   const carregarViagens = async () => {
     try {
       const resposta = await api.get('/trips');
@@ -65,7 +63,6 @@ export default function App() {
         <aside className="w-64 bg-[#A3BFFA] p-6 flex flex-col gap-4 border-r border-slate-300 shadow-md z-10 min-h-full">
           <h1 className="text-[#00153B] text-xl font-bold mb-4 px-2">Agenda de viagens</h1>
 
-          {/* Formulário agora recebe a viagemParaEditar e sabe como fechar a edição */}
           <Formulario
             onSalvar={carregarViagens}
             viagemEditada={viagemParaEditar}
@@ -85,7 +82,6 @@ export default function App() {
                   imageUrl: pegarUrlDaImagem(viagem.imageUrl)
                 }}
                 onDeletar={deletarViagem}
-                // Ignoramos a viagem formatada pelo card e passamos a viagem ORIGINAL do map para o form
                 onEditar={() => setViagemParaEditar(viagem)}
               />
             ))}
