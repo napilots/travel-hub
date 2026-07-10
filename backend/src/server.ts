@@ -6,6 +6,7 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import multipart from '@fastify/multipart'
 import fastifyStatic from '@fastify/static'
+import rateLimit from '@fastify/rate-limit'
 import { ZodError } from 'zod'
 
 import tripRoutes from './routes/tripRoutes.js'
@@ -27,6 +28,17 @@ await app.register(cors, {
 await app.register(multipart, {
   limits: {
     fileSize: 5 * 1024 * 1024 // 5 MB
+  }
+})
+
+await app.register(rateLimit, {
+  max: 100,
+  timeWindow: '1 minute',
+  allowList: ['127.0.0.1'],
+  redis: undefined,
+  skipOnError: true,
+  keyGenerator: (request) => {
+    return request.ip
   }
 })
 

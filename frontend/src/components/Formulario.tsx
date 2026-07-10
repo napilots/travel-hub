@@ -6,17 +6,45 @@ import {
 import { Button } from "@/components/ui/button"
 import { Plus, PencilLine } from "lucide-react"
 
+export interface CountryInfo {
+  name: string;
+  officialName: string;
+  capital: string;
+  region: string;
+  subregion: string;
+  population: number;
+  flag: string;
+  flagSvg: string;
+  currencies: Record<string, any>;
+  languages: Record<string, string>;
+}
+
 export interface ViagemData {
   id?: number;
+
   title: string;
-  destination: string;
+  destination?: string | null;
+
   country: string;
   city: string;
+
   startDate: string;
   endDate: string;
+
   budget: number;
   description: string;
-  imageUrl: string; 
+
+  imageUrl: string;
+
+  countryInfo?: CountryInfo;
+
+  weather?: {
+    city: string;
+    temperature: number;
+    feelsLike: number;
+    description: string;
+    icon: string;
+  };
 }
 
 interface FormularioProps {
@@ -44,7 +72,7 @@ export function Formulario({ onSalvar, viagemEditada, onFecharEdicao }: Formular
   useEffect(() => {
     if (viagemEditada) {
       setTitle(viagemEditada.title);
-      setDestination(viagemEditada.destination);
+      setDestination(viagemEditada.destination || "");
       setCountry(viagemEditada.country);
       setCity(viagemEditada.city);
       setStartDate(viagemEditada.startDate ? viagemEditada.startDate.split('T')[0] : "");
@@ -161,8 +189,8 @@ export function Formulario({ onSalvar, viagemEditada, onFecharEdicao }: Formular
               <input type="text" value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Ex: Brasil" className="w-full bg-[#2B5B9E] text-white placeholder-slate-400 p-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#4656C7]"/>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-300">Estado / Destino</label>
-              <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Ex: Bahia" className="w-full bg-[#2B5B9E] text-white placeholder-slate-400 p-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#4656C7]"/>
+              <label className="text-sm font-medium text-slate-300">Estado / Província (Opcional)</label>
+              <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Ex: Bahia (deixe vazio se não aplicável)" className="w-full bg-[#2B5B9E] text-white placeholder-slate-400 p-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#4656C7]"/>
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-slate-300">Cidade</label>
@@ -175,13 +203,28 @@ export function Formulario({ onSalvar, viagemEditada, onFecharEdicao }: Formular
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+  <div className="flex flex-col gap-2">
+    <label className="text-sm font-medium text-slate-300">
+      Data de Ida
+    </label>
+    <input
+      type="date"
+      value={startDate}
+      onChange={(e) => setStartDate(e.target.value)}
+      className="w-full bg-[#2B5B9E] text-white placeholder-slate-400 p-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#4656C7] [&::-webkit-calendar-picker-indicator]:invert"
+    />
+  </div>
+
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-300">Data de Ida</label>
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full bg-[#2B5B9E] text-white placeholder-slate-400 p-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#4656C7] [&::-webkit-calendar-picker-indicator]:invert"/>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-slate-300">Data de Volta</label>
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full bg-[#2B5B9E] text-white placeholder-slate-400 p-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#4656C7] [&::-webkit-calendar-picker-indicator]:invert"/>
+              <label className="text-sm font-medium text-slate-300">
+                Data de Volta
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full bg-[#2B5B9E] text-white placeholder-slate-400 p-3 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-[#4656C7] [&::-webkit-calendar-picker-indicator]:invert"
+              />
             </div>
           </div>
 

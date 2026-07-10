@@ -1,5 +1,10 @@
 import axios from 'axios'
 
+const weatherClient = axios.create({
+  baseURL: 'https://api.openweathermap.org',
+  timeout: 5000
+})
+
 interface WeatherResponse {
   weather: {
     main: string
@@ -27,8 +32,8 @@ export async function getWeather(city: string) {
       throw new Error('OPENWEATHER_API_KEY não configurada.')
     }
 
-    const { data } = await axios.get(
-      'https://api.openweathermap.org/data/2.5/weather',
+    const { data } = await weatherClient.get<WeatherResponse>(
+      '/data/2.5/weather',
       {
         params: {
           q: city,
@@ -53,19 +58,24 @@ export async function getWeather(city: string) {
     }
 
   } catch (error) {
-  console.error('Erro ao buscar clima:', error);
+    const axiosError = error as any
+    console.error('[Weather API] Error:', {
+      status: axiosError?.response?.status,
+      timeout: axiosError?.code === 'ECONNABORTED',
+      city
+    })
 
-  return {
-    city,
-    temperature: null,
-    feelsLike: null,
-    minTemperature: null,
-    maxTemperature: null,
-    humidity: null,
-    windSpeed: null,
-    weather: 'unknown',
-    description: 'Sem dados meteorológicos',
-    icon: null
+    return {
+      city,
+      temperature: null,
+      feelsLike: null,
+      minTemperature: null,
+      maxTemperature: null,
+      humidity: null,
+      windSpeed: null,
+      weather: 'unknown',
+      description: 'Sem dados meteorológicos',
+      icon: null
+    }
   }
-}
 }

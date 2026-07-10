@@ -10,7 +10,7 @@ datasource db {
 model Trip {
   id          Int    @id @default(autoincrement())
   title       String
-  destination String
+  destination String?
   country     String
   city        String
 

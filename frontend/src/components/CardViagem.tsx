@@ -1,14 +1,24 @@
-import { useState, useEffect } from "react"
-import { api } from "../services/api"
-import { Calendar, Trash2, CloudSun, CheckSquare, MapPin, PencilLine, DollarSign, Info, Plus } from "lucide-react"
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
   AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { type ViagemData } from "./Formulario"
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Calendar,
+  CheckSquare,
+  CloudSun,
+  DollarSign,
+  Info,
+  MapPin,
+  PencilLine,
+  Plus,
+  Trash2
+} from "lucide-react"
+import { useEffect, useState } from "react"
+import { api } from "../services/api"
+import { type ViagemData, type CountryInfo } from "./Formulario"
 
 interface Tarefa {
   id: number;
@@ -32,6 +42,20 @@ export function CardViagem({ viagem, onDeletar, onEditar }: ViagemProps) {
 
   const [clima, setClima] = useState<any>(null);
   const [carregandoClima, setCarregandoClima] = useState(false);
+
+  const countryInfo = viagem.countryInfo;
+
+  const moeda = countryInfo?.currencies
+    ? Object.values(countryInfo.currencies)[0]
+    : null;
+
+  const idiomas = countryInfo?.languages
+    ? Object.values(countryInfo.languages).join(", ")
+    : "Não informado";
+
+  const populacao = countryInfo?.population
+    ? countryInfo.population.toLocaleString("pt-BR")
+    : "Não informado";
 
   const orcamentoFormatado = Number(viagem.budget).toLocaleString('pt-BR', { 
     style: 'currency', currency: 'BRL' 
@@ -125,8 +149,23 @@ export function CardViagem({ viagem, onDeletar, onEditar }: ViagemProps) {
                 {viagem.city || viagem.title}
               </h2>
               <span className="text-sm font-medium text-slate-300 flex items-center gap-1">
-                <MapPin className="h-3 w-3" /> {viagem.country}
-              </span>
+              <MapPin className="h-3 w-3" />
+              {viagem.city}, {viagem.country}
+            </span>
+
+            {countryInfo?.flag && (
+              <div className="flex items-center gap-2 mt-2">
+                <img
+                  src={countryInfo.flag}
+                  alt={viagem.country}
+                  className="w-6 h-4 rounded shadow"
+                />
+
+                <span className="text-xs text-slate-300">
+                  {countryInfo.capital}
+                </span>
+              </div>
+            )}
             </div>
             <div className="flex items-center gap-2 text-sm font-medium text-slate-200">
               <Calendar className="h-4 w-4" />
@@ -200,6 +239,77 @@ export function CardViagem({ viagem, onDeletar, onEditar }: ViagemProps) {
             </div>
           )}
 
+          {/* Informações do País */}
+        {countryInfo && (
+          <div className="bg-[#1A365D] border border-[#2B5B9E] rounded-2xl p-5">
+            <h3 className="text-xl font-bold mb-4">
+              🌍 Informações do País
+            </h3>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3">
+                <p className="text-xs text-slate-300">Nome Oficial</p>
+                <p className="font-semibold">
+                  {countryInfo.officialName || "Não informado"}
+                </p>
+              </div>
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3">
+                <p className="text-xs text-slate-300">Capital</p>
+                <p className="font-semibold">
+                  {countryInfo.capital || "Não informado"}
+                </p>
+              </div>
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3">
+                <p className="text-xs text-slate-300">Região</p>
+                <p className="font-semibold">
+                  {countryInfo.region || "Não informado"}
+                </p>
+              </div>
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3">
+                <p className="text-xs text-slate-300">Sub-Região</p>
+                <p className="font-semibold">
+                  {countryInfo.subregion || "Não informado"}
+                </p>
+              </div>
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3">
+                <p className="text-xs text-slate-300">População</p>
+                <p className="font-semibold">
+                  {populacao}
+                </p>
+              </div>
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3">
+                <p className="text-xs text-slate-300">Idioma</p>
+                <p className="font-semibold">
+                  {idiomas}
+                </p>
+              </div>
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3">
+                <p className="text-xs text-slate-300">Moeda</p>
+                <p className="font-semibold">
+                  {moeda?.name || "Não informado"}
+                </p>
+              </div>
+
+              <div className="bg-[#2B5B9E] rounded-xl p-3 flex items-center justify-center">
+                {countryInfo.flagSvg && (
+                  <img
+                    src={countryInfo.flagSvg}
+                    alt="Bandeira"
+                    className="h-10 rounded shadow"
+                  />
+                )}
+              </div>
+
+            </div>
+          </div>
+        )}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* checklist */}

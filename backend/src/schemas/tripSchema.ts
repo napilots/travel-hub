@@ -10,12 +10,12 @@ export const createTripSchema = z.object({
     .max(100, 'O título deve possuir no máximo 100 caracteres.'),
 
   destination: z
-    .string({
-      required_error: 'O destino é obrigatório.'
-    })
+    .string()
     .trim()
     .min(2, 'O destino deve possuir pelo menos 2 caracteres.')
-    .max(100),
+    .max(100)
+    .optional()
+    .or(z.literal('')),
 
   country: z
     .string({
