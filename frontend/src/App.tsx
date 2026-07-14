@@ -4,6 +4,8 @@ import { CardViagem } from "./components/CardViagem"
 import Header from "./components/Header"
 import { api } from "./services/api"
 
+// gerencia os estados da tela (useEffect)
+// requisição via axios para dar GET nas viagens
 export default function App() {
   const [viagens, setViagens] = useState<ViagemData[]>([])
   const [busca, setBusca] = useState("")

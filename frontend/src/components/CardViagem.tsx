@@ -37,6 +37,7 @@ export function CardViagem({ viagem, onDeletar, onEditar }: ViagemProps) {
     style: 'currency', currency: 'BRL' 
   });
 
+// condicional para carregar apenas quando abre o modal
   useEffect(() => {
     if (modalAberto && viagem.id) {
       carregarTarefas();
@@ -255,7 +256,7 @@ export function CardViagem({ viagem, onDeletar, onEditar }: ViagemProps) {
               </div>
             </div>
 
-            {/* CLIMA (puxando do back) */}
+            {/* CLIMA (puxado do back) */}
             <div className="flex flex-col gap-3">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <CloudSun className="h-5 w-5 text-yellow-400" /> Clima Local

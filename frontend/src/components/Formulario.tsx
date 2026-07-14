@@ -41,6 +41,8 @@ export function Formulario({ onSalvar, viagemEditada, onFecharEdicao }: Formular
   const [aberto, setAberto] = useState(false)
   const [editandoTitulo, setEditandoTitulo] = useState(false)
 
+
+  //escuta se há uma viagem para edição
   useEffect(() => {
     if (viagemEditada) {
       setTitle(viagemEditada.title);
@@ -105,6 +107,7 @@ export function Formulario({ onSalvar, viagemEditada, onFecharEdicao }: Formular
         formData.append("image", arquivoReal);
       }
 
+      // decide entre put e post
       if (viagemEditada?.id) {
         await api.put(`/trips/${viagemEditada.id}`, formData);
       } else {
