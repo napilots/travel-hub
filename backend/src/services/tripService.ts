@@ -20,22 +20,61 @@ export async function createTrip(
   })
 }
 
-export async function getAllTrips() {
+export async function getAllTrips(page: number = 1, limit: number = 20) {
+  const maxLimit = 100
+  const normalizedLimit = Math.min(limit, maxLimit)
+  const skip = (page - 1) * normalizedLimit
+
   const trips = await prisma.trip.findMany({
     include: {
       checklists: true
     },
     orderBy: {
       createdAt: 'desc'
-    }
+    },
+    skip,
+    take: normalizedLimit
   })
 
-  const tripsWithInfo = await Promise.all(
+  const total = await prisma.trip.count()
+  const pages = Math.ceil(total / normalizedLimit)
+
+  const tripsWithInfo = await Promise.allSettled(
     trips.map(async (trip) => {
-      const [countryInfo, weather] = await Promise.all([
+      const results = await Promise.allSettled([
         getCountryInfo(trip.country),
         getWeather(trip.city)
       ])
+
+      const countryInfo = results[0].status === 'fulfilled' 
+        ? results[0].value 
+        : {
+            name: trip.country,
+            officialName: null,
+            capital: null,
+            region: null,
+            subregion: null,
+            population: null,
+            flag: null,
+            flagSvg: null,
+            currencies: {},
+            languages: {}
+          }
+
+      const weather = results[1].status === 'fulfilled'
+        ? results[1].value
+        : {
+            city: trip.city,
+            temperature: null,
+            feelsLike: null,
+            minTemperature: null,
+            maxTemperature: null,
+            humidity: null,
+            windSpeed: null,
+            weather: 'unknown',
+            description: 'Sem dados meteorológicos',
+            icon: null
+          }
 
       return {
         ...trip,
@@ -45,7 +84,18 @@ export async function getAllTrips() {
     })
   )
 
-  return tripsWithInfo
+  return {
+    data: tripsWithInfo
+      .filter(result => result.status === 'fulfilled')
+      .map(result => result.status === 'fulfilled' ? result.value : null)
+      .filter(Boolean),
+    pagination: {
+      page,
+      limit: normalizedLimit,
+      total,
+      pages
+    }
+  }
 }
 
 export async function getTripById(id: number) {
@@ -62,10 +112,40 @@ export async function getTripById(id: number) {
     throw new Error('Viagem não encontrada.')
   }
 
-  const [countryInfo, weather] = await Promise.all([
+  const results = await Promise.allSettled([
     getCountryInfo(trip.country),
     getWeather(trip.city)
   ])
+
+  const countryInfo = results[0].status === 'fulfilled'
+    ? results[0].value
+    : {
+        name: trip.country,
+        officialName: null,
+        capital: null,
+        region: null,
+        subregion: null,
+        population: null,
+        flag: null,
+        flagSvg: null,
+        currencies: {},
+        languages: {}
+      }
+
+  const weather = results[1].status === 'fulfilled'
+    ? results[1].value
+    : {
+        city: trip.city,
+        temperature: null,
+        feelsLike: null,
+        minTemperature: null,
+        maxTemperature: null,
+        humidity: null,
+        windSpeed: null,
+        weather: 'unknown',
+        description: 'Sem dados meteorológicos',
+        icon: null
+      }
 
   return {
     ...trip,
@@ -89,19 +169,29 @@ export async function updateTrip(
     throw new Error('Viagem não encontrada.')
   }
 
-  if (imageUrl) {
-    deleteImage(trip.imageUrl)
-  }
+  try {
+    const updatedTrip = await prisma.trip.update({
+      where: {
+        id
+      },
+      data: {
+        ...data,
+        imageUrl: imageUrl ?? trip.imageUrl
+      }
+    })
 
-  return prisma.trip.update({
-    where: {
-      id
-    },
-    data: {
-      ...data,
-      imageUrl: imageUrl ?? trip.imageUrl
+    if (imageUrl && trip.imageUrl) {
+      try {
+        deleteImage(trip.imageUrl)
+      } catch (error) {
+        console.error('Erro ao deletar imagem antiga:', error)
+      }
     }
-  })
+
+    return updatedTrip
+  } catch (error) {
+    throw error
+  }
 }
 
 export async function deleteTrip(id: number) {

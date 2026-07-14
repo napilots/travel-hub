@@ -55,8 +55,17 @@ export async function getAllTrips(
   reply: FastifyReply
 ) {
   try {
-    const trips = await getAllTripsService()
-    return reply.send(trips)
+    const { page = 1, limit = 20 } = request.query as {
+      page?: string | number
+      limit?: string | number
+    }
+
+    const pageNumber = Math.max(1, Number(page) || 1)
+    const limitNumber = Math.max(1, Number(limit) || 20)
+
+    const result = await getAllTripsService(pageNumber, limitNumber)
+
+    return reply.send(result)
   } catch {
     return reply.status(500).send({
       message: 'Erro ao buscar viagens.'
@@ -73,8 +82,10 @@ export async function getTripById(
     const trip = await getTripByIdService(id)
     return reply.send(trip)
   } catch (error) {
-    return reply.status(404).send({
-      message: error instanceof Error ? error.message : 'Viagem não encontrada.'
+    const message = error instanceof Error ? error.message : 'Viagem não encontrada.'
+    const statusCode = message.includes('não encontrada') ? 404 : 400
+    return reply.status(statusCode).send({
+      message
     })
   }
 }
@@ -92,7 +103,6 @@ export async function updateTrip(
 
     for await (const part of parts) {
       if (part.type === 'file') {
-        // Correção aplicada ao update também!
         imageUrl = await uploadImage(part)
       } else {
         if (part.fieldname === 'budget') {
@@ -109,8 +119,10 @@ export async function updateTrip(
 
     return reply.send(trip)
   } catch (error) {
-    return reply.status(400).send({
-      message: error instanceof Error ? error.message : 'Erro ao atualizar viagem.'
+    const message = error instanceof Error ? error.message : 'Erro ao atualizar viagem.'
+    const statusCode = message.includes('não encontrada') ? 404 : 400
+    return reply.status(statusCode).send({
+      message
     })
   }
 }
@@ -124,8 +136,10 @@ export async function deleteTrip(
     const result = await deleteTripService(id)
     return reply.send(result)
   } catch (error) {
-    return reply.status(404).send({
-      message: error instanceof Error ? error.message : 'Erro ao excluir viagem.'
+    const message = error instanceof Error ? error.message : 'Erro ao excluir viagem.'
+    const statusCode = message.includes('não encontrada') ? 404 : 400
+    return reply.status(statusCode).send({
+      message
     })
   }
 }
